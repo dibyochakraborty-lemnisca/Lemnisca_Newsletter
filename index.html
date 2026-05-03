@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>your fermentation model is delulu at 10,000L — lemnisca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #242424;
+    --ink-soft: #6b6b6b;
+    --ink-faint: #a0a0a0;
+    --rule: #e6e6e6;
+    --accent: #1a8917;     /* Medium green */
+    --code-bg: #f7f7f5;
+    --quote-bar: #242424;
+    --table-border: #ececec;
+    --serif: "Source Serif 4", Charter, "Iowan Old Style", "Apple Garamond", Georgia, serif;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 20px;
+    line-height: 1.7;
+  }
+
+  /* === Top nav === */
+  nav.topbar {
+    border-bottom: 1px solid var(--rule);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--sans);
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: saturate(180%) blur(8px);
+    background: rgba(255,255,255,0.85);
+  }
+  nav .brand {
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  nav .brand .dot { color: var(--accent); }
+  nav .meta {
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+
+  /* === Article === */
+  article {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  .kicker {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+
+  h1.title {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 46px;
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    margin: 0 0 18px;
+    color: #0f0f0f;
+  }
+
+  p.subtitle {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    margin: 0 0 36px;
+  }
+
+  .byline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 40px;
+  }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, #1a8917, #0d5c0d);
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; letter-spacing: -0.02em;
+  }
+  .byline .who { color: var(--ink); font-weight: 600; }
+  .byline .dot { color: var(--ink-faint); }
+
+  /* === Body === */
+  article p, article ul, article ol, article table {
+    font-family: var(--serif);
+    font-size: 20px;
+    line-height: 1.72;
+    color: var(--ink);
+    margin: 0 0 28px;
+  }
+
+  /* drop cap */
+  article > section.first p:first-of-type::first-letter {
+    font-family: var(--serif);
+    font-weight: 700;
+    float: left;
+    font-size: 64px;
+    line-height: 0.9;
+    padding: 6px 8px 0 0;
+    color: #0f0f0f;
+  }
+
+  h2 {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 30px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin: 56px 0 18px;
+    color: #0f0f0f;
+  }
+  h2 .num {
+    color: var(--ink-faint);
+    font-weight: 600;
+    margin-right: 10px;
+  }
+
+  h3 {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.3;
+    margin: 36px 0 12px;
+    letter-spacing: -0.01em;
+  }
+
+  strong { font-weight: 700; color: #0f0f0f; }
+  em { font-style: italic; }
+
+  a { color: inherit; text-decoration: underline; text-decoration-color: var(--ink-faint); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--accent); color: var(--accent); }
+
+  blockquote {
+    margin: 32px 0;
+    padding: 4px 0 4px 24px;
+    border-left: 3px solid var(--quote-bar);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 24px;
+    line-height: 1.5;
+    color: #1a1a1a;
+  }
+  blockquote em, blockquote strong { color: #0f0f0f; }
+
+  ul, ol { padding-left: 28px; }
+  li { margin-bottom: 10px; }
+  li::marker { color: var(--ink-faint); }
+
+  /* tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 28px 0 36px;
+  }
+  th, td {
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--table-border);
+    vertical-align: top;
+  }
+  th {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    border-bottom: 2px solid var(--ink);
+  }
+  td:first-child { font-weight: 600; }
+
+  /* code */
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.55;
+    background: var(--code-bg);
+    padding: 20px 22px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 28px 0;
+    border: 1px solid var(--rule);
+  }
+  pre code { background: transparent; padding: 0; font-size: inherit; }
+
+  /* memes / figures */
+  figure {
+    margin: 36px 0;
+    text-align: center;
+  }
+  figure img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    border: 1px solid var(--rule);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  figcaption {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  hr {
+    border: 0;
+    text-align: center;
+    margin: 56px 0;
+    color: var(--ink-faint);
+  }
+  hr::before {
+    content: "• • •";
+    letter-spacing: 12px;
+    font-size: 14px;
+  }
+
+  /* TL;DR callout */
+  .tldr {
+    background: #fafaf7;
+    border-left: 3px solid var(--accent);
+    padding: 22px 26px;
+    margin: 0 0 40px;
+    font-size: 18px;
+    line-height: 1.6;
+    border-radius: 0 6px 6px 0;
+  }
+  .tldr strong { font-family: var(--sans); }
+
+  /* footer */
+  footer.endmark {
+    text-align: center;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-soft);
+    padding: 40px 0 0;
+    border-top: 1px solid var(--rule);
+    margin-top: 56px;
+  }
+
+  /* sources */
+  .sources {
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    background: #fafafa;
+    padding: 24px 28px;
+    border-radius: 8px;
+    margin-top: 32px;
+  }
+  .sources h3 { margin-top: 0; }
+  .sources ul { padding-left: 20px; }
+  .sources li { margin-bottom: 8px; }
+
+  /* === Chat widget === */
+  #chat-fab {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: #0f0f0f;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  #chat-fab:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.22); }
+  #chat-fab svg { width: 24px; height: 24px; }
+
+  #chat-panel {
+    position: fixed;
+    bottom: 96px;
+    right: 28px;
+    width: 380px;
+    height: 560px;
+    max-height: calc(100vh - 120px);
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.22);
+    border: 1px solid var(--rule);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 100;
+    font-family: var(--sans);
+  }
+  #chat-panel.open { display: flex; animation: slideUp 0.2s ease-out; }
+  @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .chat-header {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--rule);
+    display: flex; align-items: center; justify-content: space-between;
+    background: #fafafa;
+  }
+  .chat-header .title { font-weight: 700; font-size: 15px; color: #0f0f0f; }
+  .chat-header .sub { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .chat-header button {
+    background: transparent; border: none; cursor: pointer;
+    color: var(--ink-soft); font-size: 20px; padding: 0; width: 28px; height: 28px;
+  }
+  .chat-header button:hover { color: var(--ink); }
+
+  #chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .msg {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .msg.user {
+    background: #0f0f0f;
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.bot {
+    background: #f4f4f2;
+    color: var(--ink);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .msg.bot a { color: var(--accent); }
+  .msg.bot strong { font-weight: 700; }
+  .msg.bot code { background: #e8e8e6; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+  .msg .sources-mini {
+    margin-top: 8px; padding-top: 8px;
+    border-top: 1px solid #e0e0de;
+    font-size: 11px; color: var(--ink-soft);
+  }
+  .msg .sources-mini a { display: block; margin-bottom: 2px; }
+
+  .typing { display: flex; gap: 4px; padding: 12px 14px; }
+  .typing span {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--ink-faint);
+    animation: bounce 1.2s infinite ease-in-out;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.15s; }
+  .typing span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.5; } 30% { transform: translateY(-5px); opacity: 1; } }
+
+  .chat-input-row {
+    border-top: 1px solid var(--rule);
+    padding: 12px 14px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    background: #fff;
+  }
+  #chat-input {
+    flex: 1;
+    border: 1px solid var(--rule);
+    border-radius: 18px;
+    padding: 10px 14px;
+    font-family: var(--sans);
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    max-height: 120px;
+    min-height: 38px;
+    line-height: 1.4;
+  }
+  #chat-input:focus { border-color: var(--ink); }
+  #chat-send {
+    background: #0f0f0f; color: #fff; border: none;
+    width: 38px; height: 38px; border-radius: 50%;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  #chat-send:hover { background: var(--accent); }
+  #chat-send:disabled { background: var(--ink-faint); cursor: not-allowed; }
+  #chat-send svg { width: 16px; height: 16px; }
+
+  .api-key-prompt {
+    padding: 16px;
+    background: #fffaf0;
+    border: 1px solid #f0d890;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .api-key-prompt input {
+    width: 100%; margin-top: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--rule); border-radius: 6px;
+    font-family: var(--mono); font-size: 12px;
+  }
+  .api-key-prompt button {
+    margin-top: 8px; padding: 8px 14px;
+    background: #0f0f0f; color: #fff; border: none; border-radius: 6px;
+    cursor: pointer; font-family: var(--sans); font-size: 13px; font-weight: 600;
+  }
+
+  .toggle-search {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--rule);
+    background: #fafafa;
+  }
+  .toggle-search input { margin: 0; }
+
+  @media (max-width: 720px) {
+    body { font-size: 18px; }
+    h1.title { font-size: 34px; }
+    article { padding: 32px 18px 80px; }
+    article p, article ul, article ol { font-size: 18px; }
+    blockquote { font-size: 20px; }
+    #chat-panel { width: calc(100vw - 24px); right: 12px; bottom: 84px; height: 70vh; }
+    #chat-fab { right: 16px; bottom: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <a class="brand" href="#">lemnisca<span class="dot">.</span></a>
+  <div class="meta">issue 01 · ~12 min read</div>
+</nav>
+
+<article>
+  <div class="kicker">bioprocess ML · scale-up</div>
+  <h1 class="title">your fermentation model is delulu at 10,000L</h1>
+  <p class="subtitle">on scale-up, distribution shift, and why predicting raw signals is cope.</p>
+
+  <div class="byline">
+    <div class="avatar">L</div>
+    <div>
+      <div class="who">Lemnisca Research</div>
+      <div>Apr 29, 2026 · <span class="dot">·</span> the AI layer for bioprocess</div>
+    </div>
+  </div>
+
+  <div class="tldr">
+    <strong>the bit —</strong> bioprocess ML doesn't break at scale because the biology changed. it breaks because the <em>signals</em> changed and the model never learned anything deeper than “these numbers usually go like this.” the actual fix isn't more data, it isn't a chunkier transformer, it isn't another LSTM with attention slapped on top. it's learning a representation of <em>what state the bioreactor is actually in</em>. that's the whole pitch behind JEPA, and that's what this issue is about.
+  </div>
+
+  <section class="first">
+    <h2><span class="num">01</span>the hook</h2>
+    <p>a model that nails yield in a 5L bioreactor often face-plants at 10,000L. same strain. same media. same feed profile copy-pasted from the dev run. and yet the predictions drift, the soft sensor lies, and someone on the MSAT team is staring at a DO trace at 2 a.m. like “why is the validated model off by 30 percent.”</p>
+    <p>the usual move is to collect more data, retune the LSTM, maybe sprinkle in a few engineered features. it almost never works. and there's a reason for that. it's not the model. it's <em>what the model is looking at</em>.</p>
+    <figure>
+      <img src="https://api.memegen.link/images/fine/lab_model_at_10000L/this_is_fine.png" alt="this is fine dog meme" />
+      <figcaption>your model, validated at 5L, on day 4 of a 10,000L campaign.</figcaption>
+    </figure>
+  </section>
+
+  <h2><span class="num">02</span>why the model breaks</h2>
+  <p>let's actually break this down. a 5L glass vessel and a 10,000L stainless tank are not the same physical system, and the difference is bigger than people give it credit for.</p>
+
+  <table>
+    <thead><tr><th></th><th>lab (5L)</th><th>industrial (10,000L)</th></tr></thead>
+    <tbody>
+      <tr><td>mixing time</td><td>seconds</td><td>up to ~160 s in 100 m³ vessels</td></tr>
+      <tr><td>oxygen</td><td>DO is basically uniform</td><td>strong O₂ gradients, dead zones, hypoxic pockets</td></tr>
+      <tr><td>substrate</td><td>well-mixed</td><td>high glucose near the feed port, starvation 4 meters away</td></tr>
+      <tr><td>sensors</td><td>dense, fast</td><td>sparse, delayed, sometimes one probe per zone</td></tr>
+      <tr><td>CO₂ stripping</td><td>easy</td><td>limited, local pH crashes follow</td></tr>
+    </tbody>
+  </table>
+
+  <p>here's the thing. <strong>cells respond faster than industrial vessels mix.</strong> that's a really important sentence so read it again. the relevant ratio in chemical engineering is the Damköhler number, basically <code>Da = (rate of reaction or response) / (rate of transport)</code>. in a 5L vessel, mixing wins, <code>Da ≪ 1</code>, the cell sees a homogeneous world. in a 10,000L tank, transport loses, and individual cells get yanked through gradients of glucose, oxygen, and pH on a second-to-minute scale. their transcriptional machinery adapts on a minute-to-hour scale. so the population is <em>permanently</em> in a stress regime that just doesn't exist at 5L.</p>
+
+  <p>now translate that into ML. your model was trained under one input distribution <code>P_train(X)</code> and is being deployed under a different one <code>P_deploy(X)</code>. that's textbook covariate shift. and not the cute kind where you can just reweight the training data. the <em>meaning</em> of each variable changes too. a glucose probe reading of 4 g/L at 5L is a description of the entire vessel. the same 4 g/L at 10,000L is a spatial average over a vessel where some cells are drowning in sugar and others are starving. the model has no idea.</p>
+
+  <blockquote>the model learned how things <em>looked</em> in 5L and never learned how the system actually <em>behaves</em>. and at scale, the looks change.</blockquote>
+
+  <figure>
+    <img src="https://api.memegen.link/images/mordor/one_does_not_simply/scale_a_5L_model_to_10000L.png" alt="one does not simply scale a 5L model to 10000L" />
+  </figure>
+
+  <h2><span class="num">03</span>the friction points</h2>
+  <ol>
+    <li><strong>models depend on raw signals.</strong> DO, pH, OUR, CER, OD, viable cell density. every single one shifts in distribution between vessels. probe response times alone can be 10x slower at scale.</li>
+    <li><strong>data is sparse and inconsistent.</strong> industrial runs cost six figures each. you get tens of batches, not millions. cadence differs by site. probes get swapped mid-campaign. one site logs every 30 seconds, another every 5 minutes.</li>
+    <li><strong>labels are delayed and noisy.</strong> titer is HPLC, hours later. productivity is one number per batch. you cannot couple your predictions to ground truth in real time the way you can in vision or NLP.</li>
+    <li><strong>there is no stable notion of process state.</strong> the model never had a concept of “we are now in oxygen-limited late exponential phase with rising acetate.” it just had numbers that correlated with yield in the training set.</li>
+  </ol>
+  <p>and that fourth one is the actual bug. everything else is downstream of it.</p>
+
+  <figure>
+    <img src="https://api.memegen.link/images/db/bioprocess_ml_team/shiny_new_transformer/their_actual_data_problem.png" alt="distracted boyfriend, bioprocess team distracted by shiny new transformer ignoring actual data problem" />
+  </figure>
+
+  <h2><span class="num">04</span>reframe: stop predicting, start <em>representing</em></h2>
+  <p>the default move is “we need a better predictor.” this is mid. if your inputs are unstable across scales, no predictor built on those inputs is going to generalize. you can throw GBDTs, LSTMs, or a 70B-param transformer at it, the input distribution still doesn't match.</p>
+  <p>the move that actually scales is to ask a different question first.</p>
+  <blockquote><em>what state is the bioreactor in right now?</em></blockquote>
+  <p>lag phase, mid-exponential, oxygen-limited, acetate-stressed, diauxic shift. these phases exist whether you're at 5L or 10,000L. the <em>signals describing them</em> change with vessel geometry. the <em>phases themselves</em> don't. they're a property of the cells, not the tank.</p>
+  <p>so what you want is a model that maps signals to <em>state</em>, then predicts in <em>state</em> space. that's the jump.</p>
+
+  <figure>
+    <img src="https://api.memegen.link/images/cmm/predicting_raw_signals_at_scale_is_cope.png" alt="change my mind: predicting raw signals at scale is cope" />
+  </figure>
+
+  <h2><span class="num">05</span>enter JEPA</h2>
+  <p>forget the name for a second. imagine a model that doesn't try to predict the next DO reading or the exact glucose value at minute 47. instead, it tries to answer:</p>
+  <blockquote>what kind of situation is the system in, and what kind of situation will it be in 30 minutes from now?</blockquote>
+  <p>it operates not on numbers, but on a compressed internal description of what's happening. two batches that look numerically nothing alike (one in a 5L glass vessel with 1-second probes, one in a 10,000L stainless tank with sluggish probes and a 90-second mixing dead zone) can map to the <em>same</em> internal description if they're in the same biological phase.</p>
+  <p>that's the idea behind <strong>Joint Embedding Predictive Architectures (JEPA)</strong>, the self-supervised approach Yann LeCun's group at Meta has been pushing (I-JEPA for images, V-JEPA for video). it's not a fermentation idea. it's a general claim about <em>where</em> prediction should happen: in embedding space, not in raw-data space.</p>
+
+  <h2><span class="num">06</span>how JEPA actually works</h2>
+  <p>here's the architecture stripped down. three components, one loss.</p>
+  <pre><code>        context window x                       target window y
+     (signals up to time t)               (signals around time t+Δ)
+              │                                       │
+              ▼                                       ▼
+        ┌──────────┐                          ┌───────────────┐
+        │  encoder  │                          │ target encoder │
+        │   f_θ     │                          │     f_ξ       │  (EMA of f_θ,
+        └────┬─────┘                          └───────┬───────┘   stop-gradient)
+             │                                        │
+             ▼                                        ▼
+           z_t                                       z_(t+Δ)
+             │
+             ▼
+        ┌─────────────┐
+        │ predictor  │
+        │    g_φ     │
+        └────┬───────┘
+             ▼
+           ẑ_(t+Δ)  ──────────────►   loss = || ẑ_(t+Δ) − z_(t+Δ) ||²
+                                       (in latent space, not signal space)</code></pre>
+
+  <p>there are three things going on here that matter.</p>
+  <p><strong>(a) two encoders, not one.</strong> the context encoder <code>f_θ</code> is the one that learns. the target encoder <code>f_ξ</code> is an exponential moving average of <code>f_θ</code>'s weights, with the gradient blocked. this asymmetry is load-bearing. it's the trick that came out of BYOL and DINO before JEPA inherited it. without it, the model collapses to a constant function (every input maps to the same <code>z</code>, loss goes to zero, you've learned nothing).</p>
+  <p><strong>(b) the prediction target is the encoder's own output, not the raw data.</strong> this is the actual departure from generative modeling. an autoencoder or a vanilla forecaster tries to reconstruct the future signal. JEPA tries to reconstruct the future <em>embedding</em> of that signal. so the model gets full credit for being right about the <em>gist</em> of what happens next without having to nail the exact pH at 14:32:07.</p>
+  <p><strong>(c) loss is L2 in latent space.</strong> that's it. no contrastive loss, no negatives, no GAN. just “my predicted z should match the target encoder's z.” the EMA target plus the predictor asymmetry plus carefully designed masking strategies are what keep the whole thing from collapsing.</p>
+  <p><em>small but important nuance:</em> in fermentation you'd typically mask spans of the time series, not random points, because the autocorrelation is huge and random masking is too easy. think of it as “hide the next 30 minutes, predict its representation from the previous 2 hours.”</p>
+  <p>for microbes specifically, “meaning” in latent space ends up looking like:</p>
+  <ul>
+    <li>lag phase</li>
+    <li>early exponential growth</li>
+    <li>mid-exponential, glucose-replete</li>
+    <li>oxygen-limited stress</li>
+    <li>acetate inhibition / overflow metabolism</li>
+    <li>diauxic shift</li>
+    <li>stationary / death</li>
+  </ul>
+  <p>the encoder isn't told these labels. it discovers them because they're the cleanest, most stable axes of variation in the data once you stop forcing the model to memorize sensor quirks.</p>
+
+  <figure>
+    <img src="https://api.memegen.link/images/buzz/gradients/gradients_everywhere.png" alt="buzz lightyear: gradients, gradients everywhere" />
+  </figure>
+
+  <h2><span class="num">07</span>why this fixes scale-up</h2>
+  <p>core claim:</p>
+  <blockquote>scale changes signals. scale doesn't change biology.</blockquote>
+
+  <table>
+    <thead><tr><th>thing</th><th>changes with scale?</th><th>why</th></tr></thead>
+    <tbody>
+      <tr><td>sensor readings</td><td>yes</td><td>different probes, different sample ports, different averaging</td></tr>
+      <tr><td>spatial gradients</td><td>yes</td><td>mixing time scales with V<sup>1/3</sup>, reaction time doesn't</td></tr>
+      <tr><td>mass transfer (kLa)</td><td>yes</td><td>hardware-dependent</td></tr>
+      <tr><td><strong>biological phases</strong></td><td><strong>no</strong></td><td>strain physiology</td></tr>
+      <tr><td><strong>metabolic regimes</strong></td><td><strong>no</strong></td><td>thermodynamics + enzyme kinetics</td></tr>
+    </tbody>
+  </table>
+
+  <p>a classical model trained on raw signals learns the <em>top</em> of that table. it's modeling sensor traces.</p>
+  <p>a representation-first model learns the <em>bottom</em>. its mapping looks like:</p>
+  <pre><code>  5L lab batch    ─► encoder ─► z = "early exponential"
+  10,000L batch   ─► encoder ─► z = "early exponential"</code></pre>
+  <p>same <code>z</code>. wildly different raw signals. that's literally the definition of generalization.</p>
+  <p>the formal version: if you can train an encoder <code>f</code> such that <code>f(x_lab) ≈ f(x_indust)</code> whenever the underlying biological state is the same, then a downstream predictor <code>h(z) → y</code> (titer, OUR, whatever) trained on lab data has a real shot at working at 10,000L. you've factored the problem. the messy, scale-dependent part lives in <code>f</code>. the clean, scale-invariant part lives in <code>h</code>.</p>
+  <p>this isn't science fiction. a 2024 paper in <em>Engineering in Life Sciences</em> on ML in bioreactor scale-up reported that <em>“an embedding layer improved the capability of artificial neural network models to predict cell growth at large-scale, as this approach captured similarities between the processes”</em> (<a href="https://analyticalsciencejournals.onlinelibrary.wiley.com/doi/10.1002/elsc.202400023" target="_blank">Karimi Alavijeh et al., 2024</a>). that's a smaller, less ambitious version of the same idea: stop predicting in signal space, start predicting on top of an embedding. JEPA is the more aggressive form of that bet.</p>
+
+  <figure>
+    <img src="https://api.memegen.link/images/success/same_phase_at_5L_and_10000L/same_latent_z.png" alt="success kid: same phase at 5L and 10000L = same latent z" />
+  </figure>
+
+  <h2><span class="num">08</span>where ML agents come in</h2>
+  <p>being honest: “learn a good representation” is easy to say and miserable to validate. you'll train ten encoders before you find one whose latent space is actually stable across scales. and you can't tell which one is good by squinting at the loss curve, because every JEPA-style model converges to a small loss number whether it learned anything or not.</p>
+  <p>this is where ML agents earn their keep. not as oracles. as experimentation infrastructure that runs while you sleep.</p>
+  <p>concretely, a useful agent loop does four things:</p>
+  <ol>
+    <li><strong>sweep self-supervised pretraining configs.</strong> masking strategy (random vs span vs phase-aware), encoder depth, EMA decay rate, predictor capacity. each combination produces a candidate <code>f</code>.</li>
+    <li><strong>score each <code>f</code> on a fixed scale-transfer benchmark.</strong> the metrics that matter are not training loss. they're: linear probe accuracy on phase classification, <strong>CKA</strong> (centered kernel alignment) between <code>f(lab batches)</code> and <code>f(industrial batches)</code> for matched phases, and downstream titer R² when <code>h(z) → titer</code> is trained on lab data and evaluated at industrial scale.</li>
+    <li><strong>detect embedding drift in production.</strong> once a chosen <code>f</code> is deployed, monitor the Mahalanobis distance of new batches' latent trajectories from the training cluster centers. when drift exceeds a threshold, alert or trigger retraining.</li>
+    <li><strong>flag when the encoder has nothing to say.</strong> if a new batch lands in a region of latent space that's far from any cluster the encoder ever saw, that's not a prediction, that's an extrapolation, and you should treat it that way.</li>
+  </ol>
+
+  <pre><code>while True:
+    for cfg in encoder_search_space:
+        f = pretrain_jepa(cfg, multi_scale_corpus)
+        score = (
+            0.4 * linear_probe_phase_acc(f)
+          + 0.3 * cka_across_scales(f)
+          + 0.3 * downstream_titer_r2(f)
+        )
+    promote(best(score))
+    monitor_drift(deployed_encoder)</code></pre>
+
+  <blockquote>JEPA gives you the right abstraction. agents help you find which version of that abstraction actually holds, and tell you when it stops holding.</blockquote>
+
+  <p>no agent makes a bad encoder good. but a good agent loop makes finding the right encoder roughly an order of magnitude faster, and it's the only honest way to monitor a representation in production.</p>
+
+  <h2><span class="num">09</span>proof, in three flavors</h2>
+  <h3>(a) adjacent-domain evidence</h3>
+  <p>representation-first SSL is now the dominant paradigm wherever labels are scarce. I-JEPA: from a single context block, predict the representations of various target blocks in the same image, no pixel reconstruction needed (<a href="https://arxiv.org/abs/2301.08243" target="_blank">Assran et al., CVPR 2023</a>). V-JEPA scales the same principle to 2M+ unlabeled videos using only a feature-prediction objective (<a href="https://ai.meta.com/blog/v-jepa-yann-lecun-ai-model-video-joint-embedding-predictive-architecture/" target="_blank">Meta AI, 2024</a>). BERT-style masked-token pretraining is the entire reason modern NLP works. for time series specifically, recent SSL methods like <a href="https://arxiv.org/abs/2411.10087" target="_blank">PFML (2024)</a> explicitly target representation learning without collapse, which is the exact failure mode you'd hit if you tried to slap JEPA onto sensor data naively.</p>
+
+  <h3>(b) biotech-relevant evidence</h3>
+  <p>biology is already running this playbook in adjacent layers. protein language models (ESM-style) embed sequences and transfer to dozens of downstream tasks. single-cell omics uses VAEs and contrastive learning to handle batch effects, which is structurally the same problem as scale-up: same biology, different acquisition conditions. a 2024 fermentation soft-sensor study reported a <strong>34% R² improvement and 82% reduction in variability</strong> when augmenting training with VAE-generated synthetic batches (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11351132/" target="_blank">PMC, 2024</a>). that's a lower-budget version of representation learning helping with exactly the data-sparsity problem fermentation has.</p>
+
+  <h3>(c) logical proof</h3>
+  <p>forget citations. walk the failure mode.</p>
+  <pre><code>  raw-signal model trained on 5L
+           │
+           ▼
+  deployed at 10,000L
+           │
+           ▼
+  signals shift (mixing time, gradients, probe lag)
+           │
+           ▼
+  inputs no longer in P_train
+           │
+           ▼
+  model breaks. no amount of fine-tuning fixes the input distribution.</code></pre>
+  <p>now run it with an encoder.</p>
+  <pre><code>  encoder pretrained on multi-scale signal data
+           │
+           ▼
+  encoder maps 5L and 10,000L into shared latent z
+           │
+           ▼
+  downstream predictor h(z) → y lives in latent space
+           │
+           ▼
+  z is approximately invariant to scale-induced sensor shifts
+           │
+           ▼
+  predictor transfers. as long as the *biological regime* was seen in pretraining.</code></pre>
+  <p>that last clause is doing a lot of work. read on.</p>
+
+  <figure>
+    <img src="https://api.memegen.link/images/fry/not_sure_if_model_failed/or_biology_changed.png" alt="futurama fry: not sure if model failed or biology changed" />
+  </figure>
+
+  <h2><span class="num">10</span>limitations</h2>
+  <p>if this newsletter stopped at section 9, you'd be right to be skeptical. JEPA is not magic.</p>
+  <ul>
+    <li><strong>it doesn't fix bad data.</strong> mislabeled batches, broken probes, contaminated runs, garbage in, garbage embeddings. SSL learns whatever structure is in the data, including the structure you don't want.</li>
+    <li><strong>new regimes break embeddings.</strong> if 10,000L introduces a phase that <em>literally never occurs</em> in your pretraining set (severe local hypoxia in a true dead zone, say) the encoder has nothing to map it to. it'll project the new state into the closest cluster it knows, confidently, and silently.</li>
+    <li><strong>diversity beats volume.</strong> 50 deliberately varied batches teach the encoder more than 500 nearly-identical ones. this is the opposite of how cell-culture teams usually think about “clean” datasets.</li>
+    <li><strong>representation collapse is real and sneaky.</strong> without the right asymmetric design, the encoder shortcuts to a constant output and your loss looks beautiful. the relevant guardrails (target encoders, predictor capacity, batch statistics regularization) are an active research area, not a solved problem.</li>
+    <li><strong>latent spaces are hard to interpret.</strong> “the encoder says we're in z = [0.31, -0.84, 1.02, ...]” is not a regulatory submission. you need probing classifiers, clustering, and process-knowledge-grounded labels on top before this becomes auditable for QbD or PAT contexts.</li>
+    <li><strong>probes still need to be calibrated.</strong> an encoder that learns from drifting DO probes will learn the drift. PAT hygiene is upstream of all of this.</li>
+  </ul>
+  <p>if you can't accept any of those, you don't want JEPA. you want a pilot plant.</p>
+
+  <h2><span class="num">11</span>closing</h2>
+  <p>the problem in bioprocess ML isn't a shortage of models. there are too many already. the problem is a shortage of the right <em>abstraction layer</em>.</p>
+  <p>raw-signal predictors will keep breaking the moment the vessel changes, because they were never modeling the system. they were modeling the signal trace. a soft sensor that lives or dies by probe response time is a soft sensor that lives or dies by hardware.</p>
+  <p>representation-first methods like JEPA are a serious step toward a model that actually understands what state the bioreactor is in, not just what its sensors are reading right now. they aren't a finished answer. they're the first move that doesn't fall apart at scale on contact.</p>
+  <p>that's the bet. and at lemnisca, it's the one we're making.</p>
+
+  <hr />
+
+  <div class="sources">
+    <h3>sources</h3>
+    <ul>
+      <li><a href="https://arxiv.org/abs/2301.08243" target="_blank">Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture (Assran et al., arXiv:2301.08243)</a></li>
+      <li><a href="https://ai.meta.com/blog/yann-lecun-ai-model-i-jepa/" target="_blank">I-JEPA, Meta AI blog</a></li>
+      <li><a href="https://ai.meta.com/blog/v-jepa-yann-lecun-ai-model-video-joint-embedding-predictive-architecture/" target="_blank">V-JEPA, Meta AI blog</a></li>
+      <li><a href="https://analyticalsciencejournals.onlinelibrary.wiley.com/doi/10.1002/elsc.202400023" target="_blank">A perspective-driven and technical evaluation of machine learning in bioreactor scale-up (Karimi Alavijeh et al., Eng. Life Sci., 2024)</a></li>
+      <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10218636/" target="_blank">Mimicked Mixing-Induced Heterogeneities of Industrial Bioreactors, PMC</a></li>
+      <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9828524/" target="_blank">Substantial gradient mitigation in simulated large-scale bioreactors, PMC</a></li>
+      <li><a href="https://www.mdpi.com/1424-8220/20/6/1771" target="_blank">Modern Soft-Sensing Modeling Methods for Fermentation Processes, Sensors 2020</a></li>
+      <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11351132/" target="_blank">Enhancing Fermentation Process Monitoring through Data-Driven Modeling, PMC 2024</a></li>
+      <li><a href="https://arxiv.org/abs/2411.10087" target="_blank">PFML: Self-Supervised Learning of Time-Series Data Without Representation Collapse</a></li>
+    </ul>
+  </div>
+
+  <footer class="endmark">
+    — lemnisca · building the AI layer for bioprocess
+  </footer>
+</article>
+
+<!-- Chat FAB -->
+<button id="chat-fab" aria-label="Open chat">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+  </svg>
+</button>
+
+<!-- Chat Panel -->
+<div id="chat-panel" role="dialog" aria-label="Chat with article">
+  <div class="chat-header">
+    <div>
+      <div class="title">ask the article</div>
+      <div class="sub">powered by Gemini · web search enabled</div>
+    </div>
+    <button id="chat-close" aria-label="Close">×</button>
+  </div>
+  <div id="chat-messages"></div>
+  <div class="toggle-search">
+    <input type="checkbox" id="toggle-search" checked />
+    <label for="toggle-search">enable Google Search grounding</label>
+  </div>
+  <div class="chat-input-row">
+    <textarea id="chat-input" placeholder="ask about JEPA, scale-up, anything..." rows="1"></textarea>
+    <button id="chat-send" aria-label="Send">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// Article context for chatbot
+const ARTICLE_CONTEXT = `
+Newsletter: "Your fermentation model is delulu at 10,000L" by Lemnisca.
+Thesis: Bioprocess ML breaks at scale because signals shift, not because biology changes. The fix is representation learning (JEPA), not better predictors on raw signals.
+
+Key points:
+- A 5L bioreactor model fails at 10,000L due to covariate shift: P_train(X) ≠ P_deploy(X).
+- At industrial scale, mixing time (up to ~160s in 100m³) exceeds cell response time. Damköhler number Da = response/transport. Da << 1 at lab scale (well-mixed); Da ~ 1 or higher at industrial scale (gradients dominate).
+- This creates O₂ gradients, glucose hot spots near feed ports, starvation zones far away, local pH crashes from poor CO₂ stripping.
+- A glucose reading of 4 g/L at 5L is uniform; at 10,000L it's a spatial average over heterogeneous cells.
+- Four friction points: (1) models depend on raw signals that shift, (2) data is sparse (tens of batches), (3) labels (titer) are delayed via offline HPLC, (4) no stable notion of process state.
+- Reframe: don't predict yield from raw signals; first learn a representation z of "what state is the bioreactor in".
+- JEPA = Joint Embedding Predictive Architecture. Yann LeCun / Meta. I-JEPA (images, CVPR 2023, Assran et al.), V-JEPA (video, 2024).
+- Mechanism: context encoder f_θ produces z_t. Target encoder f_ξ (EMA of f_θ, stop-gradient) produces z_(t+Δ). Predictor g_φ maps z_t → ẑ_(t+Δ). Loss = ||ẑ − z||² in latent space, NOT in signal space.
+- Why it doesn't collapse: EMA target + stop-gradient + asymmetric predictor. This trick comes from BYOL/DINO.
+- For fermentation time series, mask spans (e.g. next 30 min), not random points, due to autocorrelation.
+- Latent space discovers biological phases: lag, exponential, oxygen-limited, acetate-stressed, diauxic shift, stationary.
+- Why it fixes scale-up: scale changes signals (sensors, gradients, kLa) but not biology (phases, metabolic regimes). Encoder f maps both lab and industrial signals into a shared z. Downstream predictor h(z)→y becomes scale-invariant.
+- Cited support: Karimi Alavijeh et al. 2024 (Eng. Life Sci.) showed an embedding layer improved ANN cell growth prediction at large scale.
+- ML agents role: sweep SSL configs (masking strategy, EMA decay, predictor capacity). Score by (a) linear probe accuracy on phase classification, (b) CKA between lab and industrial embeddings, (c) downstream titer R². Detect embedding drift in production via Mahalanobis distance.
+- Proof layers: (A) adjacent domains: I-JEPA, V-JEPA, BERT, PFML (time series SSL without collapse). (B) biotech: ESM protein LMs, single-cell VAEs, fermentation soft-sensor study showed 34% R² improvement and 82% lower variability with VAE augmentation. (C) logical: raw-signal model on shifted distribution → fails. Encoder maps to invariant z → predictor transfers.
+- Limitations: doesn't fix bad data; new regimes never seen in pretraining still break it; diversity > volume in batches; representation collapse is sneaky; latent space hard to interpret for QbD/PAT regulatory contexts; probe drift propagates.
+- Conclusion: the problem in bioprocess ML isn't a shortage of models, it's a shortage of the right abstraction layer.
+`;
+
+// State
+const chatState = {
+  apiKey: localStorage.getItem('gemini_api_key') || '',
+  history: []
+};
+
+// Elements
+const fab = document.getElementById('chat-fab');
+const panel = document.getElementById('chat-panel');
+const closeBtn = document.getElementById('chat-close');
+const messagesEl = document.getElementById('chat-messages');
+const input = document.getElementById('chat-input');
+const sendBtn = document.getElementById('chat-send');
+const toggleSearch = document.getElementById('toggle-search');
+
+fab.addEventListener('click', () => {
+  panel.classList.add('open');
+  if (messagesEl.children.length === 0) renderInitial();
+  input.focus();
+});
+closeBtn.addEventListener('click', () => panel.classList.remove('open'));
+
+function renderInitial() {
+  if (!chatState.apiKey) {
+    const div = document.createElement('div');
+    div.className = 'msg bot';
+    div.innerHTML = `
+      <div class="api-key-prompt">
+        <strong>Set your Gemini API key</strong><br/>
+        Get one at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>. Stored locally in your browser only.
+        <input type="password" id="api-key-input" placeholder="AIza..." />
+        <button id="save-key">Save</button>
+      </div>
+    `;
+    messagesEl.appendChild(div);
+    document.getElementById('save-key').addEventListener('click', () => {
+      const v = document.getElementById('api-key-input').value.trim();
+      if (v) {
+        chatState.apiKey = v;
+        localStorage.setItem('gemini_api_key', v);
+        messagesEl.innerHTML = '';
+        renderInitial();
+      }
+    });
+    return;
+  }
+  addBotMessage("hey — i've read the whole article. ask me anything about JEPA, fermentation scale-up, or anything tangential. i can web search too.");
+}
+
+function addUserMessage(text) {
+  const div = document.createElement('div');
+  div.className = 'msg user';
+  div.textContent = text;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function addBotMessage(text, sources) {
+  const div = document.createElement('div');
+  div.className = 'msg bot';
+  // simple markdown-ish: **bold**, `code`, links
+  let html = escapeHtml(text)
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+    .replace(/\n/g, '<br/>');
+  div.innerHTML = html;
+  if (sources && sources.length) {
+    const s = document.createElement('div');
+    s.className = 'sources-mini';
+    s.innerHTML = '<strong>sources</strong>' + sources.slice(0, 4).map(
+      src => `<a href="${src.uri}" target="_blank">→ ${escapeHtml(src.title || src.uri)}</a>`
+    ).join('');
+    div.appendChild(s);
+  }
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function addTyping() {
+  const div = document.createElement('div');
+  div.className = 'msg bot typing';
+  div.id = 'typing-indicator';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+function removeTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+async function sendMessage(userText) {
+  addUserMessage(userText);
+  chatState.history.push({ role: 'user', parts: [{ text: userText }] });
+  input.value = '';
+  input.style.height = 'auto';
+  sendBtn.disabled = true;
+  addTyping();
+
+  try {
+    const systemInstruction = {
+      parts: [{
+        text: `You are an assistant embedded in a Lemnisca newsletter article about JEPA and fermentation scale-up. Answer questions using the article content as primary context, and use Google Search for anything beyond it. Keep answers concise (under 200 words usually) and conversational, matching the article's lowercase/casual register. Use markdown sparingly: **bold**, \`code\`, [links](url). Cite sources when web-searching.\n\nARTICLE CONTEXT:\n${ARTICLE_CONTEXT}`
+      }]
+    };
+
+    const body = {
+      systemInstruction,
+      contents: chatState.history,
+      generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+    };
+    if (toggleSearch.checked) {
+      body.tools = [{ google_search: {} }];
+    }
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key=${encodeURIComponent(chatState.apiKey)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      }
+    );
+
+    removeTyping();
+
+    if (!res.ok) {
+      const err = await res.text();
+      addBotMessage(`error: ${res.status}. ${err.slice(0, 200)}`);
+      sendBtn.disabled = false;
+      return;
+    }
+
+    const data = await res.json();
+    const candidate = data.candidates && data.candidates[0];
+    const text = candidate?.content?.parts?.map(p => p.text).filter(Boolean).join('\n') || '(no response)';
+
+    // Grounding sources
+    let sources = [];
+    const gm = candidate?.groundingMetadata;
+    if (gm?.groundingChunks) {
+      sources = gm.groundingChunks
+        .filter(c => c.web)
+        .map(c => ({ uri: c.web.uri, title: c.web.title }));
+    }
+
+    chatState.history.push({ role: 'model', parts: [{ text }] });
+    addBotMessage(text, sources);
+  } catch (e) {
+    removeTyping();
+    addBotMessage(`network error: ${e.message}`);
+  }
+  sendBtn.disabled = false;
+}
+
+sendBtn.addEventListener('click', () => {
+  const v = input.value.trim();
+  if (v && chatState.apiKey) sendMessage(v);
+});
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendBtn.click();
+  }
+});
+input.addEventListener('input', () => {
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+});
+</script>
+
+</body>
+</html>
